@@ -9,14 +9,12 @@
 //
 
 #include "core/application/GameApplication.hpp"
-#include <module/ModuleLoader.hpp>
 #include <ui/UIModule.hpp>
 #include <opengl/OpenGLModule.hpp>
 #include <opengl/OpenGL.hpp>
 
 using namespace HORIZON::CORE::APPLICATION;
 using namespace HORIZON::CORE::LOOP;
-using namespace HORIZON::MODULE;
 using namespace HORIZON::UI;
 using namespace HORIZON::OPENGL;
 using namespace HORIZON::PARALLEL;
@@ -24,13 +22,9 @@ using namespace HORIZON::PARALLEL;
 
 GameApplication::GameApplication() :
         _window(),
-        _updateLoop([this] { return HasWindow(); }, [this](DeltaTime const& time) { InternalUpdate(time); }),
-        _renderLoop([this] { return HasWindow(); }, [this](DeltaTime const& time) { InternalRender(time); }, [this]
-        {
-            GetWindow()->MakeContextCurrent();      // TODO: move that to a render queue?
-            glClearColor(0, 0, 0, 1);
-            glViewport(0, 0, 640, 480);
-        })
+        _updateLoop([] { return true; }, [this](DeltaTime const& time) { Update(time); }),
+        _renderLoop([] { return true; }, [this](DeltaTime const& time) { Render(time); },
+                    [this]() { PreRender(); }, [this]() { PostRender(); })
 { }
 
 GameApplication::~GameApplication()
@@ -40,15 +34,12 @@ GameApplication::~GameApplication()
 
 bool GameApplication::Initialise()
 {
-    // Load additional modules
-    if (!(ModuleLoader::Load(UI::GetModule()) && ModuleLoader::Load(OPENGL::GetModule())))
-        return false;
-
     SetWindow<UI::Window>(GetStartupWindowSettings());
 
     // register the event polling to the main loop
     // this blocks the main thread because no timeout is specified!
     Register([] { return UI::WaitEvents(); });
+
 
     // make sure to give up context here, otherwise i cannot move it to the render thread!
     Window::FreeContext();
@@ -68,38 +59,45 @@ void GameApplication::Destroy()
 {
     // Close window if this was called from outside
     // This also stops the loops for update and render.
-    if (_window) _window->Close();
+    _window->Close();
 }
 
-void GameApplication::InternalUpdate(const DeltaTime& time)
+void GameApplication::Update(const DeltaTime& time)
 {
     // update input for next frame
-    _window->GetInput()->Next();
-
-    Update(time);
+    _window->GetInput().Next();
 }
 
-void GameApplication::InternalRender(const DeltaTime& time)
+void GameApplication::PreRender() noexcept
 {
-    Render(time);
+    // TODO: move that to a render queue?
+    GetWindow()->MakeContextCurrent();
+    glClearColor(0, 0, 0, 1);
+    glViewport(0, 0, 640, 480);
+
+}
+
+void GameApplication::Render(const DeltaTime& time)
+{
+    //TODO: renderer draw
 
     _window->SwapBuffers();
 }
 
-void GameApplication::OnWindowClosed(std::shared_ptr<UI::Window> const& window)
+void GameApplication::PostRender() noexcept
 {
-    // only release the smart pointer if they point to the same window, otherwise it is a replacement
-    if (window == _window)
-    {
-        // signal main thread loop to stop
-        Terminate();
+    // make sure that all gpu memory is freed
+}
 
-        // join threads !BEFORE! signaling main thread, otherwise we might have (access) race conditions.
-        _updateLoop.Join();
-        _renderLoop.Join();
+void GameApplication::OnWindowClosed(Window const& window)
+{
+    //TODO: detect window replacement
 
-        // release "our" pointer of the window
-        // window destruction can start from here (normally, it should only happen after this method returns, see WindowManager).
-        _window.reset();
-    }
+
+    // join threads !BEFORE! signaling main thread, otherwise we might have (access) race conditions.
+    _updateLoop.Join();
+    _renderLoop.Join();
+
+    // signal main thread loop to stop
+    Terminate();
 }

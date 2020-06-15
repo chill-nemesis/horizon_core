@@ -17,13 +17,16 @@
 
 
 #include <log/LogModule.hpp>
+#include <log/Log.hpp>
 #include <ui/UIModule.hpp>
 #include <opengl/OpenGLModule.hpp>
 #include <arg/Args.hpp>
+#include <parallel/ThreadPool.hpp>
+
+#include <mutex>
 #include <csignal>
 
 using namespace HORIZON::LOG;
-using namespace HORIZON::MODULE;
 
 
 bool       _engineInitialised = false;
@@ -89,9 +92,12 @@ namespace HORIZON::CORE
             // Parse arguments
             ParseArgs(argc, argv);
 
+            // make the global thread pool
+            ThreadPool::Global = std::make_shared<ThreadPool>();
+
 
             //TODO: make that nicer
-            if (!(ModuleLoader::Load(LOG::GetModule())))
+            if (!(LOG::Initialise() && UI::Initialise() && OPENGL::Initialise()))
             {
                 Error("Error starting core modules, terminating Horizon.");
                 lock.unlock();
@@ -121,8 +127,9 @@ namespace HORIZON::CORE
 
         Info("Initiating shutdown");
 
+        LOG::Destroy();
 
-        ModuleLoader::Unload();
+        PARALLEL::ThreadPool::Global.reset();
 
         _engineInitialised = false;
     }

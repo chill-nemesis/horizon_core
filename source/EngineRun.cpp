@@ -11,17 +11,14 @@
 #include "core/Horizon.hpp"
 #include "core/EngineInitialisation.hpp"
 #include "core/application/IApplication.hpp"
-#include <parallel/Worker.hpp>
-#include <time/Clock.hpp>
 #include <log/Log.hpp>
+#include <arg/Args.hpp>
 
 using namespace HORIZON;
 using namespace HORIZON::CORE::APPLICATION;
 using namespace HORIZON::PARALLEL;
 using namespace HORIZON::TIME;
-using namespace HORIZON::UI;
 using namespace HORIZON::LOG;
-
 
 void HORIZON::CORE::RunApplication()
 {
