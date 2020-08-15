@@ -14,90 +14,46 @@
 #include <opengl/OpenGL.hpp>
 
 using namespace HORIZON::CORE::APPLICATION;
-using namespace HORIZON::CORE::LOOP;
+using namespace HORIZON::PARALLEL::LOOP;
 using namespace HORIZON::UI;
 using namespace HORIZON::OPENGL;
 using namespace HORIZON::PARALLEL;
 
 
-GameApplication::GameApplication() :
-        _window(),
-        _updateLoop([] { return true; }, [this](DeltaTime const& time) { Update(time); }),
-        _renderLoop([] { return true; }, [this](DeltaTime const& time) { Render(time); },
-                    [this]() { PreRender(); }, [this]() { PostRender(); })
-{ }
+GameApplication::GameApplication(WindowSettings const& settings) :
+        _window(settings), // this order matters (render manager releases UI from thread; render manager needs the correct window instance)
+        _renderManager(_window)
+{
+    // render manager self-manages loop-termination, so there is no need to register NotifyOnClose for rendermanager here
+
+    // TODO: detect window replacement
+    // register window closing to notify the game app. This terminates the app.
+    _window.NotifyOnClose([this](Window const& window) { Terminate(); });
+}
 
 GameApplication::~GameApplication()
 {
+    // TODO: unregister event callback for polling
     Destroy();
 }
 
 bool GameApplication::Initialise()
 {
-    SetWindow<UI::Window>(GetStartupWindowSettings());
-
     // register the event polling to the main loop
     // this blocks the main thread because no timeout is specified!
     Register([] { return UI::WaitEvents(); });
 
-
-    // make sure to give up context here, otherwise i cannot move it to the render thread!
-    Window::FreeContext();
-
     return true;
 }
 
-
 void GameApplication::StartThreads()
-{
-    _updateLoop.Run();
-    _renderLoop.Run();
-}
+{ _renderManager.Start(); }
 
+// Stop threads is not necessary, since rendermanager stops itself once the window is getting closed.
 
 void GameApplication::Destroy()
 {
     // Close window if this was called from outside
     // This also stops the loops for update and render.
-    _window->Close();
-}
-
-void GameApplication::Update(const DeltaTime& time)
-{
-    // update input for next frame
-    _window->GetInput().Next();
-}
-
-void GameApplication::PreRender() noexcept
-{
-    // TODO: move that to a render queue?
-    GetWindow()->MakeContextCurrent();
-    glClearColor(0, 0, 0, 1);
-    glViewport(0, 0, 640, 480);
-
-}
-
-void GameApplication::Render(const DeltaTime& time)
-{
-    //TODO: renderer draw
-
-    _window->SwapBuffers();
-}
-
-void GameApplication::PostRender() noexcept
-{
-    // make sure that all gpu memory is freed
-}
-
-void GameApplication::OnWindowClosed(Window const& window)
-{
-    //TODO: detect window replacement
-
-
-    // join threads !BEFORE! signaling main thread, otherwise we might have (access) race conditions.
-    _updateLoop.Join();
-    _renderLoop.Join();
-
-    // signal main thread loop to stop
-    Terminate();
+    _window.Close();
 }

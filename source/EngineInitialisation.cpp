@@ -21,7 +21,7 @@
 #include <ui/UIModule.hpp>
 #include <opengl/OpenGLModule.hpp>
 #include <arg/Args.hpp>
-#include <parallel/ThreadPool.hpp>
+#include <parallel/async/Async.hpp>
 
 #include <mutex>
 #include <csignal>
@@ -84,7 +84,7 @@ namespace HORIZON::CORE
         {
             using namespace HORIZON::ARG;
             using namespace HORIZON::LOG;
-            using namespace HORIZON::PARALLEL;
+            using namespace HORIZON::PARALLEL::ASYNC;
             using namespace HORIZON::TIME;
 
             Info("Loading core modules: ");
@@ -93,7 +93,7 @@ namespace HORIZON::CORE
             ParseArgs(argc, argv);
 
             // make the global thread pool
-            ThreadPool::Global = std::make_shared<ThreadPool>();
+            SetGlobalThreadPool(std::make_shared<ThreadPool>());
 
 
             //TODO: make that nicer
@@ -120,8 +120,7 @@ namespace HORIZON::CORE
 
         if (!_engineInitialised)
         {
-            Warn("Engine is not initialised, ignoring call to terminate.");
-            return;
+            Warn("Engine is not initialised. Trying to terminate...");
         }
 
 
@@ -129,7 +128,7 @@ namespace HORIZON::CORE
 
         LOG::Destroy();
 
-        PARALLEL::ThreadPool::Global.reset();
+        PARALLEL::ASYNC::ReleaseGlobalThreadPool();
 
         _engineInitialised = false;
     }

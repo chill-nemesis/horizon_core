@@ -11,35 +11,25 @@
 
 #pragma once
 
-#include <memory>
+#include "core/application/BaseLoopApplication.hpp"
 
 #include <ui/Window.hpp>
-#include <time/Clock.hpp>
-#include <render/scene/SceneManager.hpp>
+#include <render/RenderManager.hpp>
 
-#include "core/application/BaseLoopApplication.hpp"
-#include "core/loop/BackgroundFixTickLoop.hpp"
-#include "core/loop/BackgroundLoop.hpp"
+#include <memory>
 
 
 namespace HORIZON::CORE::APPLICATION
 {
-    class GameApplication : public BaseLoopApplication<LOOP::Loop>
+    class GameApplication : public BaseLoopApplication<PARALLEL::LOOP::Loop>
     {
-        //    TODO: maybe have a threadpool per application instance?
-
-    public:
-        using DeltaTime = TIME::Clock::DurationType;
-        using UpdateLoop = LOOP::BackgroundFixTickLoop<60>;
-
     private:
-        std::shared_ptr<UI::Window> _window = nullptr;
-        UpdateLoop                  _updateLoop;
-        LOOP::BackgroundLoop        _renderLoop;
+        UI::Window            _window;
+        RENDER::RenderManager _renderManager;
 
 
     public:
-        GameApplication();
+        explicit GameApplication(UI::WindowSettings const& settings = UI::WindowSettings());
 
         ~GameApplication();
 
@@ -48,38 +38,15 @@ namespace HORIZON::CORE::APPLICATION
 
         void Destroy() final;
 
-        [[nodiscard]] inline std::shared_ptr<UI::Window>& GetWindow()
+        [[nodiscard]] inline UI::Window& GetWindow()
         { return _window; }
 
-        template<typename R>
-        std::enable_if_t<std::is_base_of<UI::Window, R>::value, void>
-        SetWindow(UI::WindowSettings const& settings)
-        {
-            //TODO: what if window needs to be replaced?
+        inline RENDER::SCENE::SceneManager& GetSceneManager() noexcept
+        { return _renderManager.GetSceneManager(); }
 
-            auto newWindow = std::make_shared<R>(settings);
-            newWindow->NotifyOnClose([this](UI::Window const& window) { OnWindowClosed(window); });
-
-            // this triggers the destructor of the old window
-            _window.swap(newWindow);
-        }
-
+        //    TODO: window replacement/settings change?
 
     protected:
-        [[nodiscard]] virtual UI::WindowSettings GetStartupWindowSettings() const = 0;
-
         void StartThreads() final;
-
-    private:
-
-        void PreRender() noexcept;
-
-        void PostRender() noexcept;
-
-        void Update(DeltaTime const& time);
-
-        void Render(DeltaTime const& time);
-
-        void OnWindowClosed(UI::Window const& window);
     };
 }

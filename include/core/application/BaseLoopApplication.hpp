@@ -11,9 +11,11 @@
 
 #pragma once
 
-#include "IApplication.hpp"
-#include "../loop/Loop.hpp"
+#include "core/application/IApplication.hpp"
+
+#include <parallel/loop/Loop.hpp>
 #include <algorithm/stl_extension/vector.hpp>
+
 #include <functional>
 
 namespace HORIZON::CORE::APPLICATION
@@ -24,7 +26,7 @@ namespace HORIZON::CORE::APPLICATION
      * There is no guarantee of the execution order of callbacks.
      */
     template<class L,
-            std::enable_if_t<std::is_base_of<LOOP::Loop, L>::value, int> = 0>
+            std::enable_if_t<std::is_base_of<PARALLEL::LOOP::Loop, L>::value, int> = 0>
     class BaseLoopApplication : public IApplication
     {
     public:
@@ -79,6 +81,7 @@ namespace HORIZON::CORE::APPLICATION
         {
             StartThreads();
             _loop.Run();
+            StopThreads();
         }
 
 
@@ -87,6 +90,12 @@ namespace HORIZON::CORE::APPLICATION
          * Enables the inherited class to start threads (from the main thread), before it is blocked inside the application loop.
          */
         virtual void StartThreads()
+        { }
+
+        /*!
+         * Enables the inherited class to stop/join threads with the main thread after Terminate has been called.
+         */
+        virtual void StopThreads()
         { }
 
     private:
