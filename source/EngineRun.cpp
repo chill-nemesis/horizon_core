@@ -22,9 +22,9 @@ using namespace HORIZON::LOG;
 
 void HORIZON::CORE::RunApplication()
 {
-    auto app = std::move(GetApp());
-
     Debug("Running application ", ARG::GetAppPath(), ".");
+
+    auto app = std::move(GetApp());
 
     if (!app->Initialise())
     {

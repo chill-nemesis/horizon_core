@@ -28,20 +28,17 @@ GameApplication::GameApplication(WindowSettings const& settings) :
 
     // TODO: detect window replacement
     // register window closing to notify the game app. This terminates the app.
-    _window.NotifyOnClose([this](Window const& window) { Terminate(); });
+    _events.emplace_back(_window.NotifyOnClose([this](Window const& window) { Terminate(); }));
 }
 
 GameApplication::~GameApplication()
-{
-    // TODO: unregister event callback for polling
-    Destroy();
-}
+{ Destroy(); }
 
 bool GameApplication::Initialise()
 {
     // register the event polling to the main loop
     // this blocks the main thread because no timeout is specified!
-    Register([] { return UI::WaitEvents(); });
+    _events.emplace_back(Register([] { return UI::WaitEvents(); }));
 
     return true;
 }

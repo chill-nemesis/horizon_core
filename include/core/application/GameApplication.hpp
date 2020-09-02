@@ -14,6 +14,7 @@
 #include "core/application/BaseLoopApplication.hpp"
 
 #include <ui/Window.hpp>
+#include <callable/CallbackManager.hpp>
 #include <render/RenderManager.hpp>
 
 #include <memory>
@@ -24,8 +25,9 @@ namespace HORIZON::CORE::APPLICATION
     class GameApplication : public BaseLoopApplication<PARALLEL::LOOP::Loop>
     {
     private:
-        UI::Window            _window;
-        RENDER::RenderManager _renderManager;
+        UI::Window                            _window;
+        RENDER::RenderManager                 _renderManager;
+        std::vector<CALLABLE::CallbackHandle> _events;
 
 
     public:

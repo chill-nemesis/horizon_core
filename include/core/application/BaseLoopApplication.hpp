@@ -14,7 +14,9 @@
 #include "core/application/IApplication.hpp"
 
 #include <parallel/loop/Loop.hpp>
+#include <callable/CallbackManager.hpp>
 #include <algorithm/stl_extension/vector.hpp>
+
 
 #include <functional>
 
@@ -30,26 +32,24 @@ namespace HORIZON::CORE::APPLICATION
     class BaseLoopApplication : public IApplication
     {
     public:
-        using LoopCallback = std::function<void(void)>;
+        using MainThreadCallback = std::function<void(void)>;
         using LoopType = L;
+        using DeltaTime = typename LoopType::DeltaTime;
 
     private:
-        using LoopCallbackContainer = std::vector<LoopCallback>;
-
-
-        LoopCallbackContainer _callbacks;
-        LoopType              _loop;
+        std::shared_ptr<CALLABLE::CallbackManager<void(void)>> _mainThreadCallbacks;
+        LoopType                                              _loop;
 
 
     public:
         BaseLoopApplication() :
-                _loop([] { return true; }, std::bind(&BaseLoopApplication<L>::LoopTick, this))
+                _mainThreadCallbacks(CALLABLE::CallbackManager<void(void)>::Create()),
+                // first is loop terminate predicate, second is the loop callback for each tick
+                _loop([] { return true; }, [this](DeltaTime) { _mainThreadCallbacks->Call(); })
         { }
 
         ~BaseLoopApplication()
-        {
-            Terminate();
-        }
+        { Terminate(); }
 
         [[maybe_unused]] inline LoopType const& GetLoop() const
         { return _loop; }
@@ -64,15 +64,8 @@ namespace HORIZON::CORE::APPLICATION
          * Registers a callback for the main loop.
          * Each callback gets called once per loop cycle, but there is no guarantee on order.
          */
-        inline void Register(LoopCallback const& callback)
-        { _callbacks.push_back(callback); }
-
-        /*!
-         * Tries to remove a previously added callback.
-         * @return True if successful, false otherwise.
-         */
-        [[maybe_unused]] inline bool Unregister(LoopCallback const& callback)
-        { return ALGORITHM::STL_EXTENSION::EraseItemFromVector(_callbacks, callback); }
+        inline CALLABLE::CallbackHandle Register(MainThreadCallback&& callback)
+        { return std::move(_mainThreadCallbacks->Register(std::forward<MainThreadCallback>(callback))); }
 
         /*!
          * Starts user threads, then runs the main thread in a loop.
@@ -97,16 +90,6 @@ namespace HORIZON::CORE::APPLICATION
          */
         virtual void StopThreads()
         { }
-
-    private:
-        /*!
-         * The callback for each loop tick
-         */
-        void LoopTick()
-        {
-            for (auto& callback : _callbacks)
-                callback();
-        }
 
     };
 }

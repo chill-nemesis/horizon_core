@@ -24,7 +24,7 @@ set(HORIZON_COMPILE_SOURCES ${HEADER} ${SOURCE})
 
 add_library(horizon ${HORIZON_COMPILE_SOURCES})
 # TODO: fix required modules
-target_link_libraries(horizon horizon_parallel horizon_log horizon_time horizon_parallel horizon_ui horizon_opengl horizon_arg horizon_render)
+target_link_libraries(horizon horizon_parallel horizon_log horizon_time horizon_parallel horizon_ui horizon_opengl horizon_arg horizon_render horizon_callable)
 
 target_include_directories(horizon PUBLIC include/)
 
