@@ -28,7 +28,7 @@ GameApplication::GameApplication(WindowSettings const& settings) :
 
     // TODO: detect window replacement
     // register window closing to notify the game app. This terminates the app.
-    _events.emplace_back(_window.NotifyOnClose([this](Window const& window) { Terminate(); }));
+    _events.emplace_back(_window.NotifyOnClose([this](Window const&) { Terminate(); }));
 }
 
 GameApplication::~GameApplication()
