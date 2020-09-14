@@ -40,15 +40,29 @@ namespace HORIZON::CORE
 
         //TODO: stop running app
 
-        Terminate();
+        // try to access the lock (this serves as a check whether the crash occurred during init/destroy
+        if (_entryGuard.try_lock())
+        {
+            _entryGuard.unlock();
+            Terminate();
 
-        exit(signal);
+            // this tries to clean up resources
+            exit(signal);
+        }
+        else
+        {
+            Error("Error occurred during initialisation or termination. No graceful shutdown possible!");
+
+            // this is the nuke...
+            abort();
+        }
     }
 
     void AddSystemSignals()
     {
         signal(SIGINT, TerminateEngine);
-        signal(SIGABRT, TerminateEngine);
+        //do not register abort signal, this is the nuke option
+        // signal(SIGABRT, TerminateEngine);
         signal(SIGTERM, TerminateEngine);
         #if _POSIX
         signal(SIGKILL, TerminateEngine);
@@ -93,10 +107,10 @@ namespace HORIZON::CORE
             ParseArgs(argc, argv);
 
             // make the global thread pool
+            // thread pool does not require log module
             SetGlobalThreadPool(std::make_shared<ThreadPool>());
 
-
-            //TODO: make that nicer
+            //TODO: make that nicer, order is important!
             if (!(LOG::Initialise() && UI::Initialise() && OPENGL::Initialise()))
             {
                 Error("Error starting core modules, terminating Horizon.");
