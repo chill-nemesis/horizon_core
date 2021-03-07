@@ -23,8 +23,9 @@
 namespace HORIZON::CORE::APPLICATION
 {
     /*!
-     * Runs a main loop (inside the main thread).
-     * Callbacks are to be kept as fast as possible and must not block.
+     * @details Runs an application with a main-thread loop. Users may register callbacks to the main thread tick via @see Register()
+     *
+     * @info Callbacks are to be kept as fast as possible and must not block.
      * There is no guarantee of the execution order of callbacks.
      */
     template<class L,
@@ -38,7 +39,7 @@ namespace HORIZON::CORE::APPLICATION
 
     private:
         std::shared_ptr<CALLABLE::CallbackManager<void(void)>> _mainThreadCallbacks;
-        LoopType                                              _loop;
+        LoopType                                               _loop;
 
 
     public:
@@ -55,20 +56,20 @@ namespace HORIZON::CORE::APPLICATION
         { return _loop; }
 
         /*!
-         * Terminates the running application.
+         * @details Terminates the running application.
          */
         inline void Terminate()
         { _loop.Terminate(); }
 
         /*!
-         * Registers a callback for the main loop.
-         * Each callback gets called once per loop cycle, but there is no guarantee on order.
+         * @details Registers a callback for the main loop.
+         * @note Each callback gets called once per loop cycle, but there is no guarantee on order.
          */
         inline CALLABLE::CallbackHandle Register(MainThreadCallback&& callback)
-        { return std::move(_mainThreadCallbacks->Register(std::forward<MainThreadCallback>(callback))); }
+        { return _mainThreadCallbacks->Register(std::forward<MainThreadCallback>(callback)); }
 
         /*!
-         * Starts user threads, then runs the main thread in a loop.
+         * @details Starts user threads, then runs the main thread in a loop.
          */
         inline void Run() final
         {
@@ -80,13 +81,13 @@ namespace HORIZON::CORE::APPLICATION
 
     protected:
         /*!
-         * Enables the inherited class to start threads (from the main thread), before it is blocked inside the application loop.
+         * @details Enables the inherited class to start threads (from the main thread), before it is blocked inside the application loop.
          */
         virtual void StartThreads()
         { }
 
         /*!
-         * Enables the inherited class to stop/join threads with the main thread after Terminate has been called.
+         * @details Enables the inherited class to stop/join threads with the main thread after Terminate has been called.
          */
         virtual void StopThreads()
         { }

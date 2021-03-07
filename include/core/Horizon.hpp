@@ -16,4 +16,9 @@
 #include <memory>
 
 
+// CRITICAL: Currently, the user has to implement this method to pass an application to horizon. Find a better way to do that!
+/*!
+ * @details The user needs to implement this method to pass an application to the horizon engine.
+ */
 extern std::unique_ptr<HORIZON::CORE::APPLICATION::IApplication> GetApp();
+

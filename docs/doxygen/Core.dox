@@ -1,0 +1,31 @@
+/*!
+ * @defgroup group_module_core Core
+ * @ingroup group_horizon
+ * @brief The core module of the horizon.
+ *
+ * @details The core module takes care of program start, engine initialisation and other setup/termination code across potentially loaded modules.
+ * Despite its name, this module is not required for other modules to be used.
+ *
+ * @warning This module has seen some major changes since its creation. I am currently thinking of renaming it to application, since it mainly
+ * contains application-creation/handling code.
+ *
+ * @warning If you include this module, you must not implement a main method. Horizon takes care of that!
+ */
+
+/*!
+ * @ingroup group_module_core
+ *
+ * @details The namespace of the core module.
+ */
+namespace HORIZON::CORE
+{
+};
+
+/*!
+ * @ingroup group_module_core
+ *
+ * @details The namespace of the application interfaces.
+ */
+namespace HORIZON::CORE::APPLICATION
+{
+};

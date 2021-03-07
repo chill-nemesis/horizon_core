@@ -22,6 +22,9 @@
 
 namespace HORIZON::CORE::APPLICATION
 {
+    /*!
+     * @details The application interface for games. This class provides ui-management and a render manager.
+     */
     class GameApplication : public BaseLoopApplication<PARALLEL::LOOP::Loop>
     {
     private:
@@ -31,18 +34,39 @@ namespace HORIZON::CORE::APPLICATION
 
 
     public:
+        /*!
+         * @brief Creates a new game application.
+         * @param settings  The window settings used during UI creation.
+         */
         explicit GameApplication(UI::WindowSettings const& settings = UI::WindowSettings());
 
+        /*!
+         * @details Makes sure that all ui and render elements attached to this application are freed.
+         */
         ~GameApplication();
 
+        /*!
+         * @details Attaches the game application callbacks to the loop tick.
+         * @return  True if the application could be initialised successfully.
+         */
         bool Initialise() final;
 
-
+        /*!
+         * @details Makes sure that all attached elements (ui and render components) are released. After calling this method, the application will
+         * be in a valid state but cannot do anything besides terminating.
+         */
         void Destroy() final;
 
+        /*!
+         * @details After a call to Destroy() the window will be closed.
+         * @return The associated window.
+         */
         [[nodiscard]] inline UI::Window& GetWindow()
         { return _window; }
 
+        /*!
+         * @return The scene manager of the application.
+         */
         inline RENDER::SCENE::SceneManager& GetSceneManager() noexcept
         { return _renderManager.GetSceneManager(); }
 

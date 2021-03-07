@@ -10,7 +10,6 @@
 
 #include "core/application/GameApplication.hpp"
 #include <ui/UIModule.hpp>
-#include <opengl/OpenGLModule.hpp>
 #include <opengl/OpenGL.hpp>
 
 using namespace HORIZON::CORE::APPLICATION;

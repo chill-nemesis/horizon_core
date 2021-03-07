@@ -19,7 +19,6 @@
 #include <log/LogModule.hpp>
 #include <log/Log.hpp>
 #include <ui/UIModule.hpp>
-#include <opengl/OpenGLModule.hpp>
 #include <arg/Args.hpp>
 #include <parallel/async/Async.hpp>
 
@@ -111,7 +110,7 @@ namespace HORIZON::CORE
             SetGlobalThreadPool(std::make_shared<ThreadPool>());
 
             //TODO: make that nicer, order is important!
-            if (!(LOG::Initialise() && UI::Initialise() && OPENGL::Initialise()))
+            if (!(LOG::Initialise() && UI::Initialise()))
             {
                 Error("Error starting core modules, terminating Horizon.");
                 lock.unlock();

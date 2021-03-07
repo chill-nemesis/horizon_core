@@ -14,18 +14,18 @@
 namespace HORIZON::CORE
 {
     /*!
-     * Starts the engine.
+     * @brief Starts the engine.
      */
     void Initialise(int argc, char** argv);
 
 
     /*!
-     * Runs the user application.
+     * @brief Runs the user-provided application.
      */
     void RunApplication();
 
     /*!
-     * Terminates the engine.
+     * @brief Terminates the engine.
      */
     void Terminate();
 }
