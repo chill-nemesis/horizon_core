@@ -47,7 +47,7 @@ void GameApplication::StartThreads()
 
 // Stop threads is not necessary, since rendermanager stops itself once the window is getting closed.
 
-void GameApplication::Destroy()
+void GameApplication::Destroy() noexcept
 {
     // Close window if this was called from outside
     // This also stops the loops for update and render.

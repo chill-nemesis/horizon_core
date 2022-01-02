@@ -55,7 +55,7 @@ namespace HORIZON::CORE::APPLICATION
          * @details Makes sure that all attached elements (ui and render components) are released. After calling this method, the application will
          * be in a valid state but cannot do anything besides terminating.
          */
-        void Destroy() final;
+        void Destroy() noexcept final;
 
         /*!
          * @details After a call to Destroy() the window will be closed.
