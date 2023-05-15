@@ -43,7 +43,7 @@ namespace HORIZON::CORE::APPLICATION
         /*!
          * @details Makes sure that all ui and render elements attached to this application are freed.
          */
-        ~GameApplication();
+        ~GameApplication() override;
 
         /*!
          * @details Attaches the game application callbacks to the loop tick.
@@ -67,7 +67,7 @@ namespace HORIZON::CORE::APPLICATION
         /*!
          * @return The scene manager of the application.
          */
-        inline RENDER::SCENE::SceneManager& GetSceneManager() noexcept
+        [[nodiscard]] inline RENDER::SCENE::SceneManager& GetSceneManager() noexcept
         { return _renderManager.GetSceneManager(); }
 
         //    TODO: window replacement/settings change?

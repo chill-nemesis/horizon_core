@@ -20,6 +20,10 @@ namespace HORIZON::CORE::APPLICATION
     class IApplication
     {
     public:
+        // WARNING: It is important to mark the destructor as virtual for polymorphic inheritance:
+        //  https://stackoverflow.com/questions/461203/when-to-use-virtual-destructors
+        virtual ~IApplication() = default;
+
         /*!
          * @deatils Initialisation occurs before the application is run.
          * This method mainly exists to provide a safe way of calling possibly inherited code (from further down the inheritance tree).

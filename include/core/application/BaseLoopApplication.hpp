@@ -44,12 +44,12 @@ namespace HORIZON::CORE::APPLICATION
 
     public:
         BaseLoopApplication() :
-                _mainThreadCallbacks(CALLABLE::CallbackManager<void(void)>::Create()),
+                _mainThreadCallbacks(CALLABLE::CallbackManager<void()>::Create()),
                 // first is loop terminate predicate, second is the loop callback for each tick
                 _loop([] { return true; }, [this](DeltaTime) { _mainThreadCallbacks->Call(); })
         { }
 
-        ~BaseLoopApplication()
+        ~BaseLoopApplication() override
         { Terminate(); }
 
         [[maybe_unused]] inline LoopType const& GetLoop() const
