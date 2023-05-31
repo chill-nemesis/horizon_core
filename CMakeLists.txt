@@ -20,6 +20,6 @@ MakeHorizonModule(
         MODULE_NAME horizon
         COMPILE_SOURCE ${HEADER} ${SOURCE}
         # TODO: fix required modules!
-        PUBLIC_DEPENDENCIES horizon_log horizon_algorithm horizon_callable horizon_parallel horizon_render horizon_ui
+        PUBLIC_DEPENDENCIES horizon_arg horizon_log horizon_algorithm horizon_callable horizon_parallel horizon_render horizon_ui
         COMPILE_DEFINITIONS ${COMPILE_DEFINITIONS}
 )
