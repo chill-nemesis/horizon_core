@@ -1,6 +1,6 @@
 //
-// @brief   
-// @details 
+// @brief
+// @details
 // @author  Steffen Peikert (ch3ll)
 // @email   Horizon@ch3ll.com
 // @version 1.0.0
@@ -8,22 +8,22 @@
 // @project Horizon
 //
 
-#define STRING(s) #s
+#define STRING(s)        #s
 #define EXPAND_STRING(s) STRING(s)
 
 
 #include "core/EngineInitialisation.hpp"
+
 #include "core/Horizon.hpp"
 
-
-#include <log/LogModule.hpp>
-#include <log/Log.hpp>
-#include <ui/UIModule.hpp>
 #include <arg/Args.hpp>
-#include <parallel/async/Async.hpp>
-
-#include <mutex>
 #include <csignal>
+#include <log/Log.hpp>
+#include <log/LogModule.hpp>
+#include <mutex>
+#include <opengl/OpenGLModule.hpp>
+#include <parallel/async/Async.hpp>
+#include <ui/UIModule.hpp>
 
 using namespace HORIZON::LOG;
 
@@ -33,117 +33,110 @@ std::mutex _entryGuard;
 
 namespace HORIZON::CORE
 {
-    void TerminateEngine(int signal)
-    {
-        Warn("Received termination signal ", signal, ".");
+	void TerminateEngine(int signal)
+	{
+		Warn("Received termination signal ", signal, ".");
 
-        //TODO: stop running app
+		// TODO: stop running app
 
-        // try to access the lock (this serves as a check whether the crash occurred during init/destroy
-        if (_entryGuard.try_lock())
-        {
-            _entryGuard.unlock();
-            Terminate();
+		// try to access the lock (this serves as a check whether the crash occurred during init/destroy
+		if (_entryGuard.try_lock())
+		{
+			_entryGuard.unlock();
+			Terminate();
 
-            // this tries to clean up resources
-            exit(signal);
-        }
-        else
-        {
-            Error("Error occurred during initialisation or termination. No graceful shutdown possible!");
+			// this tries to clean up resources
+			exit(signal);
+		}
+		else
+		{
+			Error("Error occurred during initialisation or termination. No graceful shutdown possible!");
 
-            // this is the nuke...
-            abort();
-        }
-    }
+			// this is the nuke...
+			abort();
+		}
+	}
 
-    void AddSystemSignals()
-    {
-        signal(SIGINT, TerminateEngine);
-        //do not register abort signal, this is the nuke option
-        // signal(SIGABRT, TerminateEngine);
-        signal(SIGTERM, TerminateEngine);
-        #if _POSIX
-        signal(SIGKILL, TerminateEngine);
-        #endif
-    }
+	void AddSystemSignals()
+	{
+		signal(SIGINT, TerminateEngine);
+		// do not register abort signal, this is the nuke option
+		//  signal(SIGABRT, TerminateEngine);
+		signal(SIGTERM, TerminateEngine);
+#if _POSIX
+		signal(SIGKILL, TerminateEngine);
+#endif
+	}
 
+	void Initialise(int argc, char** argv)
+	{
+		std::unique_lock<std::mutex> lock(_entryGuard);
 
-    void Initialise(int argc, char** argv)
-    {
-        std::unique_lock<std::mutex> lock(_entryGuard);
-
-        if (_engineInitialised)
-        {
-            Debug("Engine already running, ignoring further calls to initialise.");
-            return;
-        }
-
+		if (_engineInitialised)
+		{
+			Debug("Engine already running, ignoring further calls to initialise.");
+			return;
+		}
 
 
-
-        // Add system signals
-        AddSystemSignals();
-
-
-        Info("Starting Horizon.");
-        #if HORIZON_DEBUG_BUILD
-        Warn("Running DEBUG build!");
-        #endif
+		// Add system signals
+		AddSystemSignals();
 
 
-
-        // Load modules
-        {
-            using namespace HORIZON::ARG;
-            using namespace HORIZON::LOG;
-            using namespace HORIZON::PARALLEL::ASYNC;
-            using namespace HORIZON::TIME;
-
-            Info("Loading core modules: ");
-
-            // Parse arguments
-            ParseArgs(argc, argv);
-
-            // make the global thread pool
-            // thread pool does not require log module
-            SetGlobalThreadPool(std::make_shared<ThreadPool>());
-
-            //TODO: make that nicer, order is important!
-            if (!(LOG::Initialise() && UI::Initialise()))
-            {
-                Error("Error starting core modules, terminating Horizon.");
-                lock.unlock();
-                Terminate();
-                return;
-            }
-        }
+		Info("Starting Horizon.");
+#if HORIZON_DEBUG_BUILD
+		Warn("Running DEBUG build!");
+#endif
 
 
-        Info("Compiled for: ", HORIZON_OS_NAME, " v.", EXPAND_STRING(HORIZON_OS_VERSION));
-        Info("Core successfully initialised.");
+		// Load modules
+		{
+			using namespace HORIZON::ARG;
+			using namespace HORIZON::LOG;
+			using namespace HORIZON::PARALLEL::ASYNC;
+			using namespace HORIZON::TIME;
+
+			Info("Loading core modules: ");
+
+			// Parse arguments
+			ParseArgs(argc, argv);
+
+			// make the global thread pool
+			// thread pool does not require log module
+			SetGlobalThreadPool(std::make_shared<ThreadPool>());
+
+			// TODO: make that nicer, order is important!
+			if (!(LOG::Initialise() && UI::Initialise() && OPENGL::Initialise()))
+			{
+				Error("Error starting core modules, terminating Horizon.");
+				lock.unlock();
+				Terminate();
+				return;
+			}
+		}
 
 
-        _engineInitialised = true;
-    }
-
-    void Terminate()
-    {
-        std::unique_lock<std::mutex> lock(_entryGuard);
-
-        if (!_engineInitialised)
-        {
-            Warn("Engine is not initialised. Trying to terminate...");
-        }
+		Info("Compiled for: ", HORIZON_OS_NAME, " v.", EXPAND_STRING(HORIZON_OS_VERSION));
+		Info("Core successfully initialised.");
 
 
-        Info("Initiating shutdown");
+		_engineInitialised = true;
+	}
 
-        LOG::Destroy();
+	void Terminate()
+	{
+		std::unique_lock<std::mutex> lock(_entryGuard);
 
-        PARALLEL::ASYNC::ReleaseGlobalThreadPool();
+		if (!_engineInitialised) { Warn("Engine is not initialised. Trying to terminate..."); }
 
-        _engineInitialised = false;
-    }
 
-}
+		Info("Initiating shutdown");
+
+		LOG::Destroy();
+
+		PARALLEL::ASYNC::ReleaseGlobalThreadPool();
+
+		_engineInitialised = false;
+	}
+
+}  // namespace HORIZON::CORE

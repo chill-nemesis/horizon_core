@@ -1,6 +1,6 @@
 //
-// @brief   
-// @details 
+// @brief
+// @details
 // @author  Steffen Peikert (ch3ll)
 // @email   Horizon@ch3ll.com
 // @version 1.0.0
@@ -8,11 +8,12 @@
 // @project Horizon
 //
 
-#include "core/Horizon.hpp"
 #include "core/EngineInitialisation.hpp"
+#include "core/Horizon.hpp"
 #include "core/application/IApplication.hpp"
-#include <log/Log.hpp>
+
 #include <arg/Args.hpp>
+#include <log/Log.hpp>
 
 using namespace HORIZON;
 using namespace HORIZON::CORE::APPLICATION;
@@ -22,18 +23,18 @@ using namespace HORIZON::LOG;
 
 void HORIZON::CORE::RunApplication()
 {
-    Debug("Running application ", ARG::GetAppPath(), ".");
+	Debug("Running application ", ARG::GetAppPath(), ".");
 
-    auto app = GetApp();
+	auto app = std::move(GetApp());
 
-    if (!app->Initialise())
-    {
-        Warn("Error initialising application.");
-        app->Destroy();
-        return;
-    }
+	if (!app->Initialise())
+	{
+		Warn("Error initialising application.");
+		app->Destroy();
+		return;
+	}
 
-    app->Run();
+	app->Run();
 
-    app->Destroy();
+	app->Destroy();
 }

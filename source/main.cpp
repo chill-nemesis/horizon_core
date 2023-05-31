@@ -1,6 +1,6 @@
 //
-// @brief   
-// @details 
+// @brief
+// @details
 // @author  Steffen Peikert (ch3ll)
 // @email   Horizon@ch3ll.com
 // @version 1.0.0
@@ -9,27 +9,29 @@
 //
 
 
-#include "core/Horizon.hpp"
 #include "core/EngineInitialisation.hpp"
+#include "core/Horizon.hpp"
+
 #include <iostream>
 
 using namespace HORIZON::CORE;
 
 int main(int argc, char** argv)
 {
-    Initialise(argc, argv);
+	Initialise(argc, argv);
 
-    try
-    {
-        RunApplication();
-    } catch (std::exception& e)
-    {
-        //TODO: move that into engine code?
-        std::cerr << "Exception: " << e.what() << std::endl;
-    }
+	try
+	{
+		RunApplication();
+	}
+	catch (std::exception& e)
+	{
+		// TODO: move that into engine code?
+		std::cerr << "Exception: " << e.what() << std::endl;
+	}
 
-    Terminate();
+	Terminate();
 
 
-    return 0;
+	return 0;
 }
