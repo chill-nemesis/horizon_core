@@ -25,7 +25,7 @@ void HORIZON::CORE::RunApplication()
 {
 	Debug("Running application ", ARG::GetAppPath(), ".");
 
-	auto app = std::move(GetApp());
+	auto app = GetApp();
 
 	if (!app->Initialise())
 	{
