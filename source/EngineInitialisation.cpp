@@ -17,13 +17,16 @@
 #include "core/Horizon.hpp"
 
 #include <arg/Args.hpp>
+#include <chrono>
 #include <csignal>
+#include <format>
 #include <log/Log.hpp>
 #include <log/LogModule.hpp>
 #include <mutex>
 #include <opengl/OpenGLModule.hpp>
 #include <parallel/async/Async.hpp>
 #include <ui/UIModule.hpp>
+
 
 using namespace HORIZON::LOG;
 
@@ -74,7 +77,7 @@ namespace HORIZON::CORE
 
 		if (_engineInitialised)
 		{
-			Debug("Engine already running, ignoring further calls to initialise.");
+			Warn("Engine already running, ignoring additional call to initialise!");
 			return;
 		}
 
@@ -82,11 +85,17 @@ namespace HORIZON::CORE
 		// Add system signals
 		AddSystemSignals();
 
-
 		Info("Starting Horizon.");
 #if HORIZON_DEBUG_BUILD
 		Warn("Running DEBUG build!");
 #endif
+
+		// Print info:
+		{
+			auto now = std::chrono::system_clock::now();
+			Info("Current date-time is ", std::format("{:%F %T}", now));
+			Info("Compiled for: ", HORIZON_OS_NAME, " v.", EXPAND_STRING(HORIZON_OS_VERSION));
+		}
 
 
 		// Load modules
@@ -115,8 +124,6 @@ namespace HORIZON::CORE
 			}
 		}
 
-
-		Info("Compiled for: ", HORIZON_OS_NAME, " v.", EXPAND_STRING(HORIZON_OS_VERSION));
 		Info("Core successfully initialised.");
 
 
