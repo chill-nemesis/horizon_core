@@ -4,11 +4,11 @@ project(horizon_core VERSION 0.0.0 LANGUAGES CXX C)
 include(HorizonCommon)
 
 set(HEADER
-        include/core/EngineInitialisation.hpp
-        include/core/Horizon.hpp
-        include/core/application/IApplication.hpp
-        include/core/application/GameApplication.hpp
-        include/core/application/BaseLoopApplication.hpp)
+        include/horizon/core/EngineInitialisation.hpp
+        include/horizon/core/Horizon.hpp
+        include/horizon/core/application/IApplication.hpp
+        include/horizon/core/application/GameApplication.hpp
+        include/horizon/core/application/BaseLoopApplication.hpp)
 
 set(SOURCE
         source/application/GameApplication.cpp

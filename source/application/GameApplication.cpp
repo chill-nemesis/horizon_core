@@ -8,11 +8,11 @@
 // @project Horizon
 //
 
-#include "core/application/GameApplication.hpp"
+#include "horizon/core/application/GameApplication.hpp"
 
-#include <opengl/OpenGL.hpp>
-#include <opengl/OpenGLModule.hpp>
-#include <ui/UIModule.hpp>
+#include <horizon/opengl/OpenGL.hpp>
+#include <horizon/opengl/OpenGLModule.hpp>
+#include <horizon/ui/UIModule.hpp>
 
 using namespace HORIZON::CORE::APPLICATION;
 using namespace HORIZON::PARALLEL::LOOP;

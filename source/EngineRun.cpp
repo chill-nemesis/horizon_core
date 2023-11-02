@@ -8,12 +8,12 @@
 // @project Horizon
 //
 
-#include "core/EngineInitialisation.hpp"
-#include "core/Horizon.hpp"
-#include "core/application/IApplication.hpp"
+#include "horizon/core/EngineInitialisation.hpp"
+#include "horizon/core/Horizon.hpp"
+#include "horizon/core/application/IApplication.hpp"
 
-#include <arg/Args.hpp>
-#include <log/Log.hpp>
+#include <horizon/arg/Args.hpp>
+#include <horizon/log/Log.hpp>
 
 using namespace HORIZON;
 using namespace HORIZON::CORE::APPLICATION;

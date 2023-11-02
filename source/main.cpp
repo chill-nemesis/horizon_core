@@ -9,8 +9,8 @@
 //
 
 
-#include "core/EngineInitialisation.hpp"
-#include "core/Horizon.hpp"
+#include "horizon/core/EngineInitialisation.hpp"
+#include "horizon/core/Horizon.hpp"
 
 #include <iostream>
 

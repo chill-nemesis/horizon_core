@@ -12,20 +12,20 @@
 #define EXPAND_STRING(s) STRING(s)
 
 
-#include "core/EngineInitialisation.hpp"
+#include "horizon/core/EngineInitialisation.hpp"
 
-#include "core/Horizon.hpp"
+#include "horizon/core/Horizon.hpp"
 
-#include <arg/Args.hpp>
 #include <chrono>
 #include <csignal>
 #include <format>
-#include <log/Log.hpp>
-#include <log/LogModule.hpp>
+#include <horizon/arg/Args.hpp>
+#include <horizon/log/Log.hpp>
+#include <horizon/log/LogModule.hpp>
+#include <horizon/opengl/OpenGLModule.hpp>
+#include <horizon/parallel/async/Async.hpp>
+#include <horizon/ui/UIModule.hpp>
 #include <mutex>
-#include <opengl/OpenGLModule.hpp>
-#include <parallel/async/Async.hpp>
-#include <ui/UIModule.hpp>
 
 
 using namespace HORIZON::LOG;
