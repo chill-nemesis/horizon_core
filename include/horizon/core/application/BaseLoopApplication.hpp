@@ -27,7 +27,7 @@ namespace HORIZON::CORE::APPLICATION
 	 * @info Callbacks are to be kept as fast as possible and must not block.
 	 * There is no guarantee of the execution order of callbacks.
 	 */
-	template<class L, std::enable_if_t<std::is_base_of<PARALLEL::LOOP::Loop, L>::value, int> = 0>
+	template<typename L, std::enable_if_t<std::is_base_of<PARALLEL::LOOP::Loop, L>::value, int> = 0>
 	class BaseLoopApplication : public IApplication
 	{
 	public:
